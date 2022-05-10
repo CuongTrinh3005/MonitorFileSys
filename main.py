@@ -1,6 +1,6 @@
-from config import USE_FILE_TRACKER, FILE_TO_READ
-from file_processing import dump_to_json, send_content_to_clipboard
-from watch_dog import OnMyWatch
+from configuration.config import USE_FILE_TRACKER, FILE_TO_READ
+from helpers.file_processing import dump_to_json, send_content_to_clipboard
+from helpers.watch_dog import OnMyWatch
 
 
 if __name__ == '__main__':

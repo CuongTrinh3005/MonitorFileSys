@@ -1,7 +1,7 @@
 import json
 import pyperclip
-from config import USE_TEMPLATES
-from templates import data
+from configuration.config import USE_TEMPLATES
+from configuration.templates import data
 
 
 def read_file(path):

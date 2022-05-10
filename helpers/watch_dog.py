@@ -2,8 +2,8 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from datetime import datetime
 
-from config import FILE_TO_READ
-from file_processing import dump_to_json, send_content_to_clipboard
+from configuration.config import FILE_TO_READ
+from helpers.file_processing import dump_to_json, send_content_to_clipboard
 
 
 class OnMyWatch:

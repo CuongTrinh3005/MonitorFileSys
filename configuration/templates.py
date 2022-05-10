@@ -7,12 +7,14 @@ data = {
         {
             "smart_contract_version_id": "1000",
             "smart_contract_param_vals": {
-                "denomination": "GBP",
-                "gross_interest_rate": "0.08",
+                "denomination": "[\"GBP\", \"HKD\"]",
+                "interest_rate": "0.05",
                 "internal_account_1": "1111",
                 "internal_account_2": "2222",
                 "internal_account_3": "3333",
-                "total_days": "365"
+                "total_days": "365",
+                "accrue_digits": "5",
+                "apply_digits": "2"
             },
             "code": "api = '3.8.0'\nversion = '0.0.1'\ntside = Tside.LIABILITY"
         },
@@ -59,8 +61,19 @@ data = {
                     {
                         "client_transaction_id": "22",
                         "inbound_hard_settlement": {
-                            "amount": "1000",
+                            "amount": "10000",
                             "denomination": "GBP",
+                            "target_account": {
+                                "account_id": "Main"
+                            },
+                            "internal_account_id": "3333"
+                        }
+                    },
+                    {
+                        "client_transaction_id": "122",
+                        "inbound_hard_settlement": {
+                            "amount": "1500",
+                            "denomination": "HKD",
                             "target_account": {
                                 "account_id": "Main"
                             },
