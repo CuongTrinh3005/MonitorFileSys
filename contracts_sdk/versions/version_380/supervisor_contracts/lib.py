@@ -1,0 +1,72 @@
+from abc import abstractmethod
+from datetime import datetime
+from functools import lru_cache
+from typing import Optional
+
+from . import types as supervisor_contract_types
+from ....utils import symbols, types_utils
+from ...version_370.supervisor_contracts import lib as v370_lib
+from ..common import lib as common_lib
+
+
+types_registry = supervisor_contract_types.types_registry
+
+WHITELISTED_BUILTINS = common_lib.WHITELISTED_BUILTINS
+
+
+class VaultFunctionsABC(v370_lib.VaultFunctionsABC):
+    @abstractmethod
+    def update_event_type(
+        self,
+        event_type: str,
+        schedule: Optional[supervisor_contract_types.EventTypeSchedule] = None,
+        end_datetime: Optional[datetime] = None,
+    ):
+        pass
+
+    @classmethod
+    @lru_cache()
+    def _spec(cls, language_code=symbols.Languages.ENGLISH):
+        spec = super()._spec(language_code)
+        spec.public_methods['update_event_type'] = types_utils.MethodSpec(
+            name='update_event_type',
+            docstring='',
+            args=[
+                types_utils.ValueSpec(
+                    name='event_type',
+                    type='str',
+                    docstring='The `event_type` that is to be modified.'
+                ),
+                types_utils.ValueSpec(
+                    name='schedule',
+                    type='Optional[EventTypeSchedule]',
+                    docstring='Optional [EventTypeSchedule](#classes-EventTypeSchedule).'
+                ),
+                types_utils.ValueSpec(
+                    name='end_datetime',
+                    type='Optional[datetime]',
+                    docstring=(
+                        'Optional datetime representing when the '
+                        'schedule should stop executing. Must have the same timezone '
+                        'localization as the Contract.'
+                        'Note that once the `end_datetime` has been reached, '
+                        'the schedule can **no longer** be updated or re-enabled.'
+                    ),
+                ),
+            ],
+            examples=[
+                types_utils.Example(
+                    title='The Vault update event type usage example',
+                    code='''
+                        vault.update_event_type(
+                            event_type='EVENT_NAME',
+                            schedule=EventTypeSchedule(
+                                minute='*/2', # every 2 minutes
+                            ),
+                            end_datetime=vault.get_plan_creation_date()
+                        )
+                    '''
+                )
+            ]
+        )
+        return spec

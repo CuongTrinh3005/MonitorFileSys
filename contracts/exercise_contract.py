@@ -47,21 +47,21 @@ parameters = [
         display_name='Rate paid on positive balances'
     ),
     Parameter(
-        name='internal_account_1',
+        name='partner_interest_income_gl',
         description='Internal Account used for recording the postings',
         display_name='Current Account Overdraft Fee Account',
         level=Level.TEMPLATE,
         shape=AccountIdShape
     ),
     Parameter(
-        name='internal_account_2',
+        name='partner_accrued_interest_gl',
         description='Internal Account used for recording the postings',
         display_name='Current Account Interest Account',
         level=Level.TEMPLATE,
         shape=AccountIdShape
     ),
     Parameter(
-        name='internal_account_3',
+        name='partner_gl',
         description='Internal Account used for officially paying interest amount for customer',
         display_name='Current Account Interest Account',
         level=Level.TEMPLATE,
@@ -172,16 +172,16 @@ def _accrue_interest(vault, time_effective):
                 )
 
                 # Credit Internal account 1111 - debit internal account 2222
-                internal_account_1 = vault.get_parameter_timeseries(name='internal_account_1').latest()
-                internal_account_2 = vault.get_parameter_timeseries(name='internal_account_2').latest()
+                partner_interest_income_gl = vault.get_parameter_timeseries(name='partner_interest_income_gl').latest()
+                partner_accrued_interest_gl = vault.get_parameter_timeseries(name='partner_accrued_interest_gl').latest()
 
                 posting_ins.extend(
                     vault.make_internal_transfer_instructions(
                         amount=amount_to_accrue,
                         denomination=denomination,
-                        from_account_id=internal_account_2,
+                        from_account_id=partner_accrued_interest_gl,
                         from_account_address=DEFAULT_ADDRESS,
-                        to_account_id=internal_account_1,
+                        to_account_id=partner_interest_income_gl,
                         to_account_address=DEFAULT_ADDRESS,
                         asset=DEFAULT_ASSET,
                         client_transaction_id='RECORD_ACCRUED_INTEREST_BANK_{}_{}'.format(
@@ -215,14 +215,14 @@ def _apply_accrued_interest(vault, time_effective):
 
         # Fulfil any incoming interest into the account
         if amount_to_be_paid > 0:
-            internal_account_1 = vault.get_parameter_timeseries(name='internal_account_1').latest()
-            internal_account_2 = vault.get_parameter_timeseries(name='internal_account_2').latest()
-            internal_account_3 = vault.get_parameter_timeseries(name='internal_account_3').latest()
+            partner_interest_income_gl = vault.get_parameter_timeseries(name='partner_interest_income_gl').latest()
+            partner_accrued_interest_gl = vault.get_parameter_timeseries(name='partner_accrued_interest_gl').latest()
+            partner_gl = vault.get_parameter_timeseries(name='partner_gl').latest()
 
             posting_ins = vault.make_internal_transfer_instructions(
                 amount=amount_to_be_paid,
                 denomination=denomination,
-                from_account_id=internal_account_3,
+                from_account_id=partner_gl,
                 from_account_address=DEFAULT_ADDRESS,
                 to_account_id=vault.account_id,
                 to_account_address=DEFAULT_ADDRESS,
@@ -259,9 +259,9 @@ def _apply_accrued_interest(vault, time_effective):
                 vault.make_internal_transfer_instructions(
                     amount=amount_to_be_paid,
                     denomination=denomination,
-                    from_account_id=internal_account_1,
+                    from_account_id=partner_interest_income_gl,
                     from_account_address=DEFAULT_ADDRESS,
-                    to_account_id=internal_account_2,
+                    to_account_id=partner_accrued_interest_gl,
                     to_account_address=DEFAULT_ADDRESS,
                     asset=DEFAULT_ASSET,
                     client_transaction_id='RECORD_APPLY_ACCRUED_INTEREST_BANK_{}_{}'.format(
